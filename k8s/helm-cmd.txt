@@ -1,0 +1,10 @@
+mkdir -p /mnt/data/vol
+chown -R 1001:1001 /mnt/data/vol
+
+kubectl apply -f open5gs-pv-pvc.yaml
+
+helm pull oci://registry-1.docker.io/gradiant/open5gs --version 2.7.6
+
+helm install open5gs oci://registry-1.docker.io/gradiant/open5gs --version 2.2.3 -f 5gSA-values.yaml -n open5gs --create-namespace
+
+kubectl port-forward svc/open5gs-webui 9999:9999 -n open5gs
