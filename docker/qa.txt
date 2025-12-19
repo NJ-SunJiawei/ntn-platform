@@ -1,0 +1,12 @@
+如果你希望用当前用户拥有的文件，也可以把容器以 user: "472" 启动（或用 --user 472）：
+services:
+  grafana:
+    image: grafana/grafana
+    user: "472"
+    volumes:
+      - /path/on/host/provisioning:/etc/grafana/provisioning
+
+
+can't read dashboard provisioning files from directory
+path=/etc/grafana/provisioning/dashboards
+error="open /etc/grafana/provisioning/dashboards: permission denied"
