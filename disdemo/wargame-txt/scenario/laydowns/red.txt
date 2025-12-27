@@ -1,0 +1,110 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+include_once platforms/include.txt
+include_once zones/blue_zone.txt
+include_once zones/green_zone.txt
+include_once zones/purple_zone.txt
+
+platform RedBase COMMAND 
+   side red
+   position 39:13:46.35n 97:34:59.36w
+   heading -90 deg
+   
+end_platform
+
+platform BravoRed FIGHTER 
+   side red
+   heading -90 deg
+
+   position 39:16:06.16n 97:58:41.44w
+   route
+      label bravo_loiter
+      position 39:25:24.50n 97:59:38.43w altitude 25000.00 ft
+         speed 500 mph
+      position 39:25:40n 98:13:18w
+      position 39:37:31n 98:13:07w
+      position 39:37:22n 98:00:44w
+      goto bravo_loiter
+   end_route
+
+end_platform
+
+platform CharlieRed FIGHTER 
+   side red
+   heading -90 deg
+
+   route
+      label charlie_loiter
+      position 39:00:58.74n 98:00:13.86w altitude 25000.00 ft
+         speed 500 mph
+      position 39:00:28n 98:13:04w
+      position 38:45:42n 98:13:06w
+      position 38:46:11n 98:00:15w
+      goto charlie_loiter
+   end_route
+
+end_platform
+
+platform RedBomber BOMBER
+   side red
+   heading -90 deg
+
+   position 39:12:44.82n 97:50:58.16w
+
+   route
+      label bomber_loiter
+      position 39:12:44.28n 97:42:47.91w altitude 25000.00 ft
+         speed 500 mph
+      position 39:13:11n 97:52:53w
+      position 39:25:33n 97:52:43w
+      position 39:25:00n 97:42:58w
+      position 39:00:28n 97:43:07w
+      position 39:00:15n 97:53:51w
+      position 39:13:11n 97:52:59w
+      goto bomber_loiter
+   end_route
+
+end_platform
+
+platform RedSamLauncher SAM_LAUNCHER
+   side red 
+   heading -90 deg
+
+   route
+      label sam_loiter
+         position 39:10:26.46n 97:31:21.12w
+         speed 50 mi/h
+         altitude 0.00 ft msl 
+      position 39:10:34n 97:38:15w 
+      position 39:16:43n 97:38:08w 
+      position 39:16:22n 97:30:57w
+         goto sam_loiter  
+   end_route
+
+end_platform
+
+platform RedDrone SENSOR_DRONE
+   side red
+   heading -90 deg
+
+   route
+      label drone_loiter
+      position 39:13:00.84n 97:53:13.66w altitude 25000.00 ft
+         speed 500 mph
+      position 39:13:23n 97:59:42w
+      position 39:25:34n 97:59:24w
+      position 39:25:27n 97:52:43w
+      position 39:00:19n 97:53:42w
+      position 39:00:30n 97:59:57w
+      position 39:13:15n 97:59:47w
+      goto drone_loiter
+   end_route
+
+end_platform

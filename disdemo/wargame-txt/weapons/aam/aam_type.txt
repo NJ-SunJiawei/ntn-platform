@@ -1,0 +1,63 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+include_once signatures/air_target/radar.txt
+
+platform_type AAM_BASE WSF_PLATFORM
+
+  icon AIM-9X
+
+   radar_signature AIR_TARGET_RADAR_SIGNATURE
+
+  mover WSF_GUIDED_MOVER
+    total_mass       188.0 lbm
+    fuel_mass         61.0 lbm
+    specific_impulse 222.0 sec
+    thrust          2700.0 lbf
+    thrust_duration    5.1 sec
+    update_interval 0.10 s
+    aero WSF_AERO
+  end_mover
+
+  processor aim-9x_autopilot WSF_GUIDANCE_COMPUTER
+    proportional_navigation_gain  30.0
+    velocity_pursuit_gain         30.0
+    g_bias                         1.0
+    maximum_commanded_g           40.0 g
+    update_interval                0.1 s
+  end_processor
+
+  processor aim-9x_seeker WSF_PERFECT_TRACKER
+    update_interval 0.10 s
+  end_processor
+
+  processor aim-9x_fuse WSF_AIR_TARGET_FUSE
+    max_time_of_flight_to_detonate  200.0 sec
+  end_processor
+
+end_platform_type
+
+weapon_effects AIM_EFFECT WSF_SPHERICAL_LETHALITY
+  # Note:  Does not consider the hardness of any target.  All are treated the same.
+  minimum_radius  50.0 ft # largest blast radius at which damage inflicted is maximum.
+  maximum_damage   1.0    # maximum damage level achievable upon the target.
+  maximum_radius  60.0 ft # blast radius beyond which the damage inflicted is Zero.
+  minimum_damage   0.2    # damage level acheived at the maximum radius.
+  threshold_damage 0.20   # initial damage level which must be acheived
+                          # before effects begin to accumulate upon the target
+  exponent         1.00   # exponent of proportionality of damage with radius.
+end_weapon_effects
+
+weapon ADV_AAM WSF_EXPLICIT_WEAPON
+   #debug
+   launched_platform_type AAM_BASE
+   quantity 2
+   launch_delta_v 10.0 0.0 0.0 m/s
+   weapon_effects AIM_EFFECT
+end_weapon

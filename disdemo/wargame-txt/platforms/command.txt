@@ -1,0 +1,18 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+radar_signature COMMAND_RADAR_SIGNATURE
+   constant 100 m^2
+end_radar_signature
+
+platform_type COMMAND WSF_PLATFORM 
+   icon cmd_post
+   radar_signature COMMAND_RADAR_SIGNATURE
+
+end_platform_type

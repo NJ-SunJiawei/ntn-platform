@@ -1,0 +1,141 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+infrared_signature SAM_INFRARED_SIGNATURE
+   constant 1 watts/steradian
+end_infrared_signature
+
+optical_signature SAM_OPTICAL_SIGNATURE
+   constant 1 m^2
+end_optical_signature
+
+radar_signature SAM_RADAR_SIGNATURE
+   constant 1 m^2
+end_radar_signature
+
+weapon_effects SAM_WEAPON_EFFECTS WSF_GRADUATED_LETHALITY
+
+   radius_and_pk  250.0 m 1.0 # All Platforms
+end_weapon_effects
+
+aero SAM_AERO WSF_AERO
+   # Values estimated from Hoerner's Drag book
+   cd_zero_subsonic    0.10
+   cd_zero_supersonic  0.25
+   mach_begin_cd_rise  0.95
+   mach_end_cd_rise    1.30
+   mach_max_supersonic 4.00
+   reference_area      0.159 m2 # 0.45 m. body dia
+   cl_max             10.0
+   aspect_ratio       16.0 // 32.0 // AR = B^2/Sref assume span = 5Xdia
+end_aero
+
+mover SAM_MOVER WSF_GUIDED_MOVER
+   update_interval                  0.01 sec
+   integration_timestep             0.01 sec
+
+   stage 1
+      aero                          SAM_AERO
+      total_mass                    0.0078 kg
+      empty_mass                    0.0001 kg
+      thrust                        51479.4 nt
+      thrust_duration               0.77 sec
+   end_stage
+
+   stage 2
+      aero                          SAM_AERO
+      total_mass                    1284.001 kg
+      fuel_mass                     1284 kg
+      thrust_duration               20.0 sec
+      thrust                        165386.0 nt
+   end_stage
+
+   stage 3
+      aero                          SAM_AERO
+      total_mass                    854.0 kg
+   end_stage
+end_mover
+
+processor SAM_AUTOPILOT WSF_GUIDANCE_COMPUTER
+   #show_status
+   guide_to_truth true
+   //show_evaluations
+
+   script_variables
+      double PITCH_OVER_DELAY = 0.8;
+   end_script_variables
+
+   phase LIFT_OFF
+      # No guidance commands during this phase
+      guidance_delay 4 sec
+      next_phase PITCH_OVER when phase_time >= variable PITCH_OVER_DELAY secs
+   end_phase
+
+   phase PITCH_OVER
+      commanded_flight_path_angle   55 deg
+      next_phase MIDCOURSE when on_commanded_flight_path_angle
+   end_phase
+
+   phase MIDCOURSE
+
+      proportional_navigation_gain  4.0
+      next_phase TERMINAL when time_to_intercept < 10 sec
+   end_phase
+
+   phase TERMINAL
+
+      proportional_navigation_gain  4.0
+   end_phase
+end_processor
+
+processor SAM_FUSE WSF_AIR_TARGET_FUSE
+   maximum_time_of_flight 80 sec
+end_processor
+
+platform_type SAM WSF_PLATFORM
+   icon mr_missile_icon
+   infrared_signature SAM_INFRARED_SIGNATURE
+   optical_signature  SAM_OPTICAL_SIGNATURE
+   radar_signature    SAM_RADAR_SIGNATURE
+   weapon_effects     SAM_WEAPON_EFFECTS
+
+   mover SAM_MOVER end_mover
+   processor autopilot SAM_AUTOPILOT end_processor
+   processor fuse SAM_FUSE end_processor
+end_platform_type
+
+
+weapon SAM WSF_EXPLICIT_WEAPON
+
+   launched_platform_type SAM  # (User will probably choose to override this type.)
+// We will manually make our own launch computer
+#   launch_computer        MR_SAM_LAUNCH_COMPUTER end_launch_computer
+
+   # A cannister missile is ejected from the canister and ignites at 25 m altitude.
+   launch_delta_v 22.4 0 0 m/s
+
+   # The missiles are launched vertically from the canisters.
+   # We can't specify 90 degrees because of a singularity
+   tilt  89.9 degrees
+
+   # The user should cue the weapon to the target track before launching.
+   # This is a bit of a hack until the missile guidance computer will roll.
+   slew_mode azimuth
+   azimuth_slew_limits -180 deg 180 deg
+
+   # There are 2 canisters per TEL
+   quantity 2
+
+   # Assume there is some reaction time.
+   firing_delay   2.0 secs
+
+   # Salvo interval
+   salvo_interval uniform minimum 5.0 secs maximum 8.0 secs
+
+end_weapon

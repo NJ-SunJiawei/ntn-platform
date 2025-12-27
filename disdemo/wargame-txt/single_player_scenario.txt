@@ -1,0 +1,35 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+include_once scripts/check_for_warlock.txt 
+   
+include_once scripts/general_scripts.txt
+
+#blue basic set up
+include_once scenario/laydowns/blue.txt
+include_once zones/blue_zone.txt
+
+#red basic set up
+include_once scenario/laydowns/red.txt
+include_once zones/red_zone.txt
+
+#green basic set up
+include_once scenario/laydowns/green.txt
+include_once zones/green_zone.txt
+
+#purple basic set up
+include_once scenario/laydowns/purple.txt
+include_once zones/purple_zone.txt
+
+realtime
+end_time 2 hours
+
+on_initialize 
+   checkForWarlock();
+end_on_initialize

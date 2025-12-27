@@ -1,0 +1,11 @@
+{
+  "name": "demo-node",
+  "version": "1.0.0",
+  "description": "dis的node后端接收程序，并转发为websocket",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

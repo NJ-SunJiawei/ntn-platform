@@ -1,0 +1,21 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+
+
+zone PurpleZone circular
+   position 41:05:41.867n 100:01:45.865w
+   minimum_altitude 50000 ft
+   maximum_radius 100 kilometers
+   start_angle 0 deg
+   stop_angle 360 deg
+   line_color 128 0 128
+   fill_color 80 0 80 63
+
+end_zone

@@ -1,0 +1,100 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+include_once platforms/include.txt
+include_once zones/red_zone.txt
+include_once zones/purple_zone.txt
+include_once zones/blue_zone.txt
+
+platform GreenBase COMMAND 
+   side green
+   position 37:17:35.20n 100:01:06.21w
+end_platform
+
+platform BravoGreen FIGHTER 
+   side green
+   
+   route
+      label bravo_loiter
+      position 37:37:19.22n 99:51:35.99w altitude 25000.00 ft
+         speed 500 mph
+      position 37:46:34n 99:51:43w
+      position 37:46:39n 99:35:53w
+      position 37:37:17n 99:36:01w
+      goto bravo_loiter
+   end_route
+
+end_platform
+
+platform CharlieGreen FIGHTER 
+   side green
+
+   route
+      label charlie_loiter
+      position 37:37:36.77n 100:11:09.62w altitude 25000.00 ft
+         speed 500 mph
+      position 37:46:30n 100:11:03w
+      position 37:46:34n 100:27:17w
+      position 37:37:34n 100:27:52w
+      goto charlie_loiter
+   end_route
+
+end_platform
+
+platform GreenBomber BOMBER
+   side green
+   position 37:26:11.68n 100:00:04.14w
+   route
+      label bomber_loiter
+      position 37:23:38.59n 100:01:22.90w altitude 25000.00 ft
+         speed 500 mph
+      position 37:27:24n 100:01:27w
+      position 37:27:24n 99:52:23w
+      position 37:22:55n 99:52:18w
+      position 37:22:56n 100:10:34w
+      position 37:27:29n 100:10:35w
+      position 37:27:22n 100:01:24w
+      goto bomber_loiter 
+   end_route
+
+end_platform
+
+platform GreenSamLauncher SAM_LAUNCHER
+   side green
+
+   route
+      label sam_loiter
+      position 37:14:25.37n 99:55:35.14w
+         speed 50 mph
+      position 37:20:58n 99:56:45w
+      position 37:21:15n 100:06:41w
+      position 37:14:30n 100:06:30w
+      goto sam_loiter
+   end_route
+
+end_platform
+
+platform GreenDrone SENSOR_DRONE
+   side green
+   
+   route
+      label drone_loiter
+      position 37:28:23.91n 100:01:24.76w altitude 25000.00 ft
+         speed 500 mph
+      position 37:36:46n 100:01:29w
+      position 37:36:58n 100:10:50w
+      position 37:27:29n 100:10:35w
+      position 37:27:33n 99:52:08w
+      position 37:36:48n 99:51:53w
+      position 37:36:55n 100:01:28w
+      goto drone_loiter 
+   end_route
+
+
+end_platform

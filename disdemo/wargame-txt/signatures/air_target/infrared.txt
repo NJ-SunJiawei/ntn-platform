@@ -1,0 +1,12 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+infrared_signature AIR_TARGET_INFRARED_SIGNATURE
+   constant 1 watts/steradian
+end_infrared_signature

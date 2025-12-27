@@ -1,0 +1,34 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+#   Green Approximate Location:
+#   Southeast, 255 km from your starting position. 
+
+#   Red Approximate Location:
+#   East, 350 km from your starting position. 
+
+#   Purple Approximate Location:
+#   Northeast, 275 km from your starting position. 
+
+script void blue_hint()
+   string hint;
+   hint += "<h1 style=\"color:green;text-align:center;\">Green Base Location:</h1>";  
+   hint += "<p style=\"font-size:10pt;text-align:center;\">Located South East and";
+   hint += " 255 km of your current position.</p>";  
+   
+   hint += "<h1 style=\"color:red;text-align:center;\">Red Base Location:</h1>";  
+   hint += "<p style=\"font-size:10pt;text-align:center;\">Located directly East and ";
+   hint += "350 km of your current position.</p>";
+   
+   hint += "<h1 style=\"color:purple;text-align:center;\">Purple Base Location:</h1>";  
+   hint += "<p style=\"font-size:10pt;text-align:center;\">Located North East and ";
+   hint += "275 km of your current position.</p>";
+      
+   WsfPrompt.Display("Intel Debriefing", hint);
+end_script

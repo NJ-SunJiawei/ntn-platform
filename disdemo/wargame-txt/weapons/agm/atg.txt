@@ -1,0 +1,48 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+###############################################################################
+
+
+radar_signature ATG_RADAR_SIGNATURE
+   constant 1 m^2
+end_radar_signature
+
+weapon_effects ATG_EFFECTS WSF_GRADUATED_LETHALITY
+   radius_and_pk  500.0 m 1.0 
+end_weapon_effects
+
+weapon ATG WSF_EXPLICIT_WEAPON
+   launched_platform_type ATG_PLATFORM
+   weapon_effects ATG_EFFECTS
+end_weapon
+
+
+platform_type ATG_PLATFORM WSF_PLATFORM
+   icon jdam
+   radar_signature ATG_RADAR_SIGNATURE
+
+   mover WSF_GUIDED_MOVER
+      aero WSF_AERO
+      mass 500 lbs
+      update_interval 0.01 s
+   end_mover
+
+   processor guidance_computer WSF_GUIDANCE_COMPUTER
+      proportional_navigation_gain 10.0
+      velocity_pursuit_gain        10.0
+      g_bias                        1.0
+      maximum_commanded_g          25.0 g
+      guidance_delay                0.0 sec
+   end_processor
+
+   processor fuse WSF_GROUND_TARGET_FUSE
+      maximum_time_of_flight 200 seconds
+   end_processor
+end_platform_type

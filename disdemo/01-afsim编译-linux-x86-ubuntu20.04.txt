@@ -1,0 +1,457 @@
+https://mp.weixin.qq.com/s/aCdpFJ84zf1Hik-A0gIEVA?poc_token=HKZIxGijsKPzbacmG9a25CZnx9fgZC17EgQD3W3R #AFSim_二次开发_AFSim在麒麟V10_SP1_x86_64下编译  ✅✅✅
+https://mp.weixin.qq.com/s/skhd9pn3pASHnfEQi2trUg  #AFSim_编译_Ubuntu24.04_x86_64下编译 ✅✅✅
+
+
+docker pull ubuntu:24.04    gcc13需要降级到gcc9-9.5.0
+docker pull ubuntu:20.04    gcc-9.4.0 ✅✅✅  官方示例gcc-9.5.0
+
+rm -rf /tmp/.docker.xauth*
+touch /tmp/.docker.xauth
+chmod 600 /tmp/.docker.xauth
+chown root:root /tmp/.docker.xauth
+xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f /tmp/.docker.xauth nmerge -
+
+docker run  --rm --name  afsim  -it -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix  -v /tmp/.docker.xauth:/tmp/.docker.xauth -e XAUTHORITY=/tmp/.docker.xauth ubuntu:20.04 /bin/bash
+docker cp intel_麒麟V10_SP1_x86_64版 afsim:/home/src
+
+1、准备依赖
+	>apt install vim wget
+	
+	删除curl、openssl (从源码编译低版本)
+	>apt-get remove curl
+	>apt-get remove openssl
+	
+	安装C++环境
+	>apt-get update
+	>apt-get install gcc-9 g++-9
+	>apt-get install build-essential
+	>apt-get install m4 libtool autoconf automake tcl
+	----降级方法（ubuntu24.04）----
+	>rm /usr/bin/cpp /usr/bin/gcc /usr/bin/g++
+	>ln -s /usr/bin/cpp-9 /usr/bin/cpp
+	>ln -s /usr/bin/gcc-9 /usr/bin/gcc
+	>ln -s /usr/bin/g++-9 /usr/bin/g++
+	
+	安装opengl
+	>apt-get install libglu1-mesa-dev freeglut3-dev
+	
+	安装Python并设置为默认
+	>apt-get install python3
+	>update-alternatives --install /usr/bin/python python /usr/bin/python2 100
+	>update-alternatives --install /usr/bin/python python /usr/bin/python3 150
+	
+	安装CMake
+	>./cmake-3.14.5-Linux-x86_64.sh
+	>mv cmake-3.14.5-Linux-x86_64 /opt/cmake-3.14.5
+	>ln -sf /opt/cmake-3.14.5/bin/*  /usr/bin
+
+
+2、创建编译环境变量（全局）：
+	>vim ~/.bashrc
+	在末尾添加并保存：
+	export AFSIM_3RDPARTY_PATH=/home/afsim/3rd_party
+	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$AFSIM_3RDPARTY_PATH/tiff-v4.3.0-x64-lnx/lib:$AFSIM_3RDPARTY_PATH/tinyxml2-7.1.0-x64-lnx/lib:$AFSIM_3RDPARTY_PATH/sqlite-3.32.3-x64-lnx/lib:$AFSIM_3RDPARTY_PATH/sdl-2.0.16-x64-lnx/lib:$AFSIM_3RDPARTY_PATH/openssl-3.1.1-x64-lnx/lib64:$AFSIM_3RDPARTY_PATH/curl-7.79.1-x64-lnx/lib:$AFSIM_3RDPARTY_PATH/proj-8.1.1-x64-lnx/lib:$AFSIM_3RDPARTY_PATH/geos-3.5.1-x64-lnx/lib:$AFSIM_3RDPARTY_PATH/gtest-1.8.0-x64-lnx/lib:$AFSIM_3RDPARTY_PATH/zlib-1.2.11-x64-lnx/lib:$AFSIM_3RDPARTY_PATH/libpng-1.6.37-x64-lnx/lib:$AFSIM_3RDPARTY_PATH/libjpeg-9d-x64-lnx/lib:$AFSIM_3RDPARTY_PATH/gdal-3.3.2-x64-lnx/lib:$AFSIM_3RDPARTY_PATH/ffmpeg-4.2.4-x64-lnx/lib:$AFSIM_3RDPARTY_PATH/osg-3.6.3-x64-lnx/lib64:$AFSIM_3RDPARTY_PATH/osgEarth-2.10.1-x64-lnx/lib64:$AFSIM_3RDPARTY_PATH/qt-5.12.11-x64-lnx/lib:
+	export PATH=$PATH:$LD_LIBRARY_PATH:
+	export MESA_GL_VERSION_OVERRIDE=4.5
+	export PATH=$AFSIM_3RDPARTY_PATH/qt-5.12.11-x64-lnx/bin:"$PATH"
+	刷新环境变量：
+	>source ~/.bashrc
+
+3、第三方库编译
+	1、zlib-1.2.11
+	>cd zlib-1.2.11
+	>./configure --enable-shared --prefix=$AFSIM_3RDPARTY_PATH/zlib-1.2.11-x64-lnx
+	>make -j8 && make install
+	
+	2、libpng-1.6.37
+	>cd libpng-1.6.37
+	>mkdir build && cd build
+	>cmake .. -DZLIB_INCLUDE_DIR=$AFSIM_3RDPARTY_PATH/zlib-1.2.11-x64-lnx/include -DZLIB_LIBRARY_RELEASE=$AFSIM_3RDPARTY_PATH/zlib-1.2.11-x64-lnx/lib/libz.so.1.2.11 -DCMAKE_INSTALL_PREFIX=$AFSIM_3RDPARTY_PATH/libpng-1.6.37-x64-lnx -DCMAKE_BUILD_TYPE=Release
+	>make -j8 && make install
+	
+	3、libjpeg-9d
+	>cd libjpeg-9d
+	>./configure --enable-shared --prefix=$AFSIM_3RDPARTY_PATH/libjpeg-9d-x64-lnx 
+	>make -j8 && make install
+	
+	4、tiff-v4.3.0
+	>cd tiff-v4.3.0
+	>./autogen.sh
+	>./configure --with-pic --enable-shared --disable-jpeg --prefix=$AFSIM_3RDPARTY_PATH/tiff-v4.3.0-x64-lnx
+	>make -j8 && make install
+	
+	5、sqlite-3.32.3
+	>cd sqlite-3.32.3
+	>./configure --with-pic --enable-shared --prefix=$AFSIM_3RDPARTY_PATH/sqlite-3.32.3-x64-lnx
+	>make -j8 && make install
+	
+	6、sdl-2.0.16
+	>cd sdl-2.0.16
+	>./configure --with-pic --enable-shared --prefix=$AFSIM_3RDPARTY_PATH/sdl-2.0.16-x64-lnx
+	>make -j8 && make install
+       -------------------
+	sdl编译完成后，需要进入输出目录将lib文件夹拷贝一份为lib64，不然后面编译AFSim的libJoystick时会报错误:
+	make[2]: *** No rule to make target '3rd_party/sdl-2.0.16-x64-lnx/lib64/libSDL2.so', needed by 'libJoystick.so'.  Stop.
+	make[1]: *** [CMakeFiles/Makefile2:14729: build_warlock/warlock_exec/source/Joystick/CMakeFiles/Joystick.dir/all] Error 2
+	cd $AFSIM_3RDPARTY_PATH/sdl-2.0.16-x64-lnx
+       cp -r lib/ lib64/
+	###ln -s lib lib64
+	
+	7、tinyxml2-7.1.0
+	>cd tinyxml2-7.1.0
+	>mkdir build && cd build
+	>cmake .. -DCMAKE_INSTALL_PREFIX=$AFSIM_3RDPARTY_PATH/tinyxml2-7.1.0-x64-lnx -DCMAKE_BUILD_TYPE=Release
+	>make -j8 && make install
+	
+	8、gtest-1.8.0
+	>cd gtest-1.8.0
+	>mkdir build && cd build
+	>cmake .. -DCMAKE_INSTALL_PREFIX=$AFSIM_3RDPARTY_PATH/gtest-1.8.0-x64-lnx -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=true
+	>make -j8 && make install
+	
+	9、openssl-3.1.1
+	>cd openssl-3.1.1
+	>./Configure -fPIC -shared --prefix=$AFSIM_3RDPARTY_PATH/openssl-3.1.1-x64-lnx
+	>make -j8 && make install
+	
+	10、curl-7.79.1
+	>cd curl-7.79.1
+	>mkdir build && cd build
+	>cmake .. -DOPENSSL_CRYPTO_LIBRARY=$AFSIM_3RDPARTY_PATH/openssl-3.1.1-x64-lnx/lib64/libcrypto.so.3 -DOPENSSL_SSL_LIBRARY=$AFSIM_3RDPARTY_PATH/openssl-3.1.1-x64-lnx/lib64/libssl.so.3 -DOPENSSL_INCLUDE_DIR=$AFSIM_3RDPARTY_PATH/openssl-3.1.1-x64-lnx/include -DCMAKE_INSTALL_PREFIX=$AFSIM_3RDPARTY_PATH/curl-7.79.1-x64-lnx -DCMAKE_BUILD_TYPE=Release
+	>make -j8 && make install
+	
+	11、proj-8.1.1（编译时间大约30分钟）
+	>cd proj-8.1.1
+	>mkdir build && cd build
+	>cmake .. -DSQLITE3_INCLUDE_DIR=$AFSIM_3RDPARTY_PATH/sqlite-3.32.3-x64-lnx/include -DSQLITE3_LIBRARY=$AFSIM_3RDPARTY_PATH/sqlite-3.32.3-x64-lnx/lib/libsqlite3.so.0.8.6 -DEXE_SQLITE3=$AFSIM_3RDPARTY_PATH/sqlite-3.32.3-x64-lnx/bin/sqlite3 -DTIFF_INCLUDE_DIR=$AFSIM_3RDPARTY_PATH/tiff-v4.3.0-x64-lnx/include -DTIFF_LIBRARY_RELEASE=$AFSIM_3RDPARTY_PATH/tiff-v4.3.0-x64-lnx/lib/libtiff.so.5.7.0 -DCURL_LIBRARY=$AFSIM_3RDPARTY_PATH/curl-7.79.1-x64-lnx/lib/libcurl.so -DCURL_INCLUDE_DIR=$AFSIM_3RDPARTY_PATH/curl-7.79.1-x64-lnx/include -DSSL_LIBRARY=$AFSIM_3RDPARTY_PATH/openssl-3.1.1-x64-lnx/lib64/libssl.so -DSSL_INCLUDE_DIR=$AFSIM_3RDPARTY_PATH/openssl-3.1.1-x64-lnx/include -DCMAKE_INSTALL_PREFIX=$AFSIM_3RDPARTY_PATH/proj-8.1.1-x64-lnx -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=YES -DUSE_EXTERNAL_GTEST=OFF -DENABLE_CURL=ON
+	>make -j8 && make install
+      --------------------------
+      cmake时会联网从github上下载googletest的源码包，如果网络不好，则可能下载不了。这里可以手动下载后放到build目录下去，并改名为release-1.8.1.zip，然后再执行一次cmake.
+      编译完成后进入proj-8.1.1-x64-lnx，将lib64目录通过命令行复制一份为lib目录，不然编译gdal会报找不到proj的符号
+	cd $AFSIM_3RDPARTY_PATH/proj-8.1.1-x64-lnx
+       cp -r lib/ lib64/
+	###ln -s lib lib64
+
+	12、geos-3.5.1
+	>cd geos-3.5.1
+	>./configure --enable-shared --prefix=$AFSIM_3RDPARTY_PATH/geos-3.5.1-x64-lnx 
+	>make -j8 && make install
+	
+	13、gdal-3.3.2（编译时间大约30分钟）
+	>cd gdal-3.3.2
+	>./configure --prefix=$AFSIM_3RDPARTY_PATH/gdal-3.3.2-x64-lnx --with-pic --enable-shared --with-proj=$AFSIM_3RDPARTY_PATH/proj-8.1.1-x64-lnx --with-geos=$AFSIM_3RDPARTY_PATH/geos-3.5.1-x64-lnx/bin/geos-config --with-sqlite3=$AFSIM_3RDPARTY_PATH/sqlite-3.32.3-x64-lnx --with-libtiff=$AFSIM_3RDPARTY_PATH/tiff-v4.3.0-x64-lnx --with-curl=$AFSIM_3RDPARTY_PATH/curl-7.79.1-x64-lnx/bin/curl-config --with-libz=$AFSIM_3RDPARTY_PATH/zlib-1.2.11-x64-lnx --with-png=$AFSIM_3RDPARTY_PATH/libpng-1.6.37-x64-lnx --with-jpeg=$AFSIM_3RDPARTY_PATH/libjpeg-9d-x64-lnx
+	>make -j8 && make install
+	
+	14、ffmpeg-4.2.4（编译时间大约30分钟）
+	>cd ffmpeng-4.2.4
+	>./configure --enable-shared --disable-x86asm --prefix=$AFSIM_3RDPARTY_PATH/ffmpeg-4.2.4-x64-lnx 
+	>make -j8 && make install
+       ----------------(下述没出现，忽略)
+	根据gcc9的小版本不同，我这里是gcc9.5.0，在编译ffmpeg时可能会报下面的错：
+	网上说是汇编语言不兼容的问题，解决办法是修改源文件/libavcodec/x86/mathops.h中的三段代码：
+	
+	#define MULL MULL
+	static av_always_inline av_const int MULL(int a, int b, unsigned shift) {
+	    int rt, dummy;__asm__ (
+	    "imull %3 \\n\\t"
+	    "shrdl %4, %%edx, %%eax \\n\\t"
+	    : "=a" (rt), "=d" (dummy)
+	    : "a" (a), "rm" (b), "c" ((uint8_t)shift)  // 这里
+	    );
+	    return rt;
+	}
+	 
+	#define NEG_SSR32 NEG_SSR32
+	static inline int32_t NEG_SSR32(int32_t a, int8_t s) {
+	    __asm__ ("sarl %1, %0\\n\\t"
+	    : "+r" (a)
+	    : "c" ((uint8_t)(-s))    // 这里
+	    );
+	    return a;
+	}
+	
+	#define NEG_USR32 NEG_USR32
+	static inline uint32_t NEG_USR32(uint32_t a, int8_t s) {
+	    __asm__ ("shrl %1, %0\\n\\t"
+	    : "+r" (a)
+	    : "c" ((uint8_t)(-s))  // 这里
+	    );
+	    return a;
+	}
+	
+	15、osg-3.6.3（编译时间大约2小时）
+	>cd osg-3.6.3
+	>mkdir build && cd build
+	>cmake .. -DSQLITE3_INCLUDE_DIR=$AFSIM_3RDPARTY_PATH/sqlite-3.32.3-x64-lnx/include -DSQLITE3_LIBRARY=$AFSIM_3RDPARTY_PATH/sqlite-3.32.3-x64-lnx/lib/libsqlite3.so.0.8.6 -DEXE_SQLITE3=$AFSIM_3RDPARTY_PATH/sqlite-3.32.3-x64-lnx/bin/sqlite3 -DTIFF_INCLUDE_DIR=$AFSIM_3RDPARTY_PATH/tiff-v4.3.0-x64-lnx/include -DTIFF_LIBRARY_RELEASE=$AFSIM_3RDPARTY_PATH/tiff-v4.3.0-x64-lnx/lib/libtiff.so.5.7.0 -DCURL_DIR=$AFSIM_3RDPARTY_PATH/curl-7.79.1-x64-lnx -DCURL_LIBRARY_RELEASE=$AFSIM_3RDPARTY_PATH/curl-7.79.1-x64-lnx/lib/libcurl.so -DCURL_INCLUDE_DIR=$AFSIM_3RDPARTY_PATH/curl-7.79.1-x64-lnx/include -DJPEG_INCLUDE_DIR=$AFSIM_3RDPARTY_PATH/libjpeg-9d-x64-lnx/include -DJPEG_LIBRARY_RELEASE=$AFSIM_3RDPARTY_PATH/libjpeg-9d-x64-lnx/lib/libjpeg.so.9.4.0 -DGDAL_INCLUDE_DIR=$AFSIM_3RDPARTY_PATH/gdal-3.3.2-x64-lnx/include -DGDAL_LIBRARY=$AFSIM_3RDPARTY_PATH/gdal-3.3.2-x64-lnx/lib/libgdal.so.29.0.2 -DSDL2_INCLUDE_DIR=$AFSIM_3RDPARTY_PATH/sdl-2.0.16-x64-lnx/include -DSDL2_LIBRARY_RELEASE=$AFSIM_3RDPARTY_PATH/sdl-2.0.16-x64-lnx/lib/libSDL2-2.0.so.0.16.0 -DSDL2MAIN_LIBRARY=$AFSIM_3RDPARTY_PATH/sdl-2.0.16-x64-lnx/lib/libSDL2main.la -DPNG_PNG_INCLUDE_DIR=$AFSIM_3RDPARTY_PATH/libpng-1.6.37-x64-lnx/include -DPNG_LIBRARY_RELEASE=$AFSIM_3RDPARTY_PATH/libpng-1.6.37-x64-lnx/lib/libpng16.so.16.37.0 -DZLIB_INCLUDE_DIR=$AFSIM_3RDPARTY_PATH/zlib-1.2.11-x64-lnx/include -DZLIB_LIBRARY_RELEASE=$AFSIM_3RDPARTY_PATH/zlib-1.2.11-x64-lnx/lib/libz.so.1.2.11 -DFFMPEG_ROOT=$AFSIM_3RDPARTY_PATH/ffmpeg-4.2.4-x64-lnx -DCMAKE_INSTALL_PREFIX=$AFSIM_3RDPARTY_PATH/osg-3.6.3-x64-lnx -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=YES
+	>make -j8 && make install
+       ----------------------------
+	osg编译后测试：
+	>cd $AFSIM_3RDPARTY_PATH/osg-3.6.3-x64-lnx/bin
+	>./osgviewer --window 0 0 400 400 /home/src/afsim-2.9.0-kylin_v10_sp1_x86_64/resources/models/3d/b2.osgb
+	
+	16、osgEarth-2.10.1（编译时间约1.5小时）
+	>cd osgEarth-2.10.1
+	>mkdir build && cd build
+	>cmake .. -DGEOS_DIR=$AFSIM_3RDPARTY_PATH/geos-3.5.1-x64-lnx -DSQLITE3_INCLUDE_DIR=$AFSIM_3RDPARTY_PATH/sqlite-3.32.3-x64-lnx/include -DSQLITE3_LIBRARY=$AFSIM_3RDPARTY_PATH/sqlite-3.32.3-x64-lnx/lib/libsqlite3.so.0.8.6 -DEXE_SQLITE3=$AFSIM_3RDPARTY_PATH/sqlite-3.32.3-x64-lnx/bin/sqlite3 -DTIFF_INCLUDE_DIR=$AFSIM_3RDPARTY_PATH/tiff-v4.3.0-x64-lnx/include -DTIFF_LIBRARY_RELEASE=$AFSIM_3RDPARTY_PATH/tiff-v4.3.0-x64-lnx/lib/libtiff.so.5.7.0 -DCURL_DIR=$AFSIM_3RDPARTY_PATH/curl-7.79.1-x64-lnx -DCURL_LIBRARY_RELEASE=$AFSIM_3RDPARTY_PATH/curl-7.79.1-x64-lnx/lib/libcurl.so -DCURL_INCLUDE_DIR=$AFSIM_3RDPARTY_PATH/curl-7.79.1-x64-lnx/include -DJPEG_INCLUDE_DIR=$AFSIM_3RDPARTY_PATH/libjpeg-9d-x64-lnx/include -DJPEG_LIBRARY_RELEASE=$AFSIM_3RDPARTY_PATH/libjpeg-9d-x64-lnx/lib/libjpeg.so.9.4.0 -DPROJ_DIR=$AFSIM_3RDPARTY_PATH/proj-8.1.1-x64-lnx -DPROJ_INCLUDE_DIR=$AFSIM_3RDPARTY_PATH/proj-8.1.1-x64-lnx/include -DPROJ_LIBRARY_RELEASE=$AFSIM_3RDPARTY_PATH/proj-8.1.1-x64-lnx/lib/libproj.so.22.1.1 -DGDAL_DIR=$AFSIM_3RDPARTY_PATH/gdal-3.3.2-x64-lnx -DGDAL_INCLUDE_DIR=$AFSIM_3RDPARTY_PATH/gdal-3.3.2-x64-lnx/include -DGDAL_LIBRARY=$AFSIM_3RDPARTY_PATH/gdal-3.3.2-x64-lnx/lib/libgdal.so.29.0.2 -DSDL2_INCLUDE_DIR=$AFSIM_3RDPARTY_PATH/sdl-2.0.16-x64-lnx/include -DSDL2_LIBRARY_RELEASE=$AFSIM_3RDPARTY_PATH/sdl-2.0.16-x64-lnx/lib/libSDL2-2.0.so.0.16.0 -DSDL2MAIN_LIBRARY=$AFSIM_3RDPARTY_PATH/sdl-2.0.16-x64-lnx/lib/libSDL2main.la -DPNG_INCLUDE_DIR=$AFSIM_3RDPARTY_PATH/libpng-1.6.37-x64-lnx/include -DPNG_LIBRARY_RELEASE=$AFSIM_3RDPARTY_PATH/libpng-1.6.37-x64-lnx/lib/libpng16.so.16.37.0 -DZLIB_INCLUDE_DIR=$AFSIM_3RDPARTY_PATH/zlib-1.2.11-x64-lnx/include -DZLIB_LIBRARY_RELEASE=$AFSIM_3RDPARTY_PATH/zlib-1.2.11-x64-lnx/lib/libz.so.1.2.11 -DFFMPEG_ROOT=$AFSIM_3RDPARTY_PATH/ffmpeg-4.2.4-x64-lnx -DOSG_DIR=$AFSIM_3RDPARTY_PATH/osg-3.6.3-x64-lnx -DOSG_INCLUDE_DIR=$AFSIM_3RDPARTY_PATH/osg-3.6.3-x64-lnx/include -DBUILD_OSGEARTH_EXAMPLES=OFF -DCMAKE_INSTALL_PREFIX=$AFSIM_3RDPARTY_PATH/osgEarth-2.10.1-x64-lnx -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=YES -DOSGEARTH_ENABLE_FASTXDT=OFF
+	>make -j8 && make install
+       -----------------------
+	osgEarth环境变量配置：(仅仅提示，在开始全局配置中已经配置过了)
+	>vim ~/.bashrc
+	末尾添加：
+	export PATH=$AFSIM_3RDPARTY_PATH/osgEarth-2.10.1-x64-lnx/lib64:$PATH
+	export MESA_GL_VERSION_OVERRIDE=4.5
+	刷新环境变量：
+	>source ~/.bashrc
+       ----------------------
+	注：
+	MESA_GL_VERSION_OVERRIDE=4.5是为了解决运行问题：
+	VERTEX glCompileShader "main(vertex)" FAILED
+	VERTEX Shader "main(vertex)" infolog:
+	0:1(10): error: GLSL 3.30 is not supported. Supported versions are: 1.10, 1.20, 1.30, 1.40, 1.00 ES, and 3.00 ES
+	----------------------
+	osgEarth编译后测试(earth文件自己准备)：
+	>cd $AFSIM_3RDPARTY_PATH/osgEarth-2.10.1-x64-lnx/bin
+	>./osgearth_viewer --window 0 0 400 400 --sky xyz.earth
+	
+	17、qt-5.12.11（编译时间约3小时）
+	先安装依赖项：
+	>apt-get install git '^libxcb.*-dev' libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev flex libicu-dev libxslt-dev ruby libxcursor-dev libxcomposite-dev libxdamage-dev libxrandr-dev libxtst-dev libxss-dev libdbus-1-dev libevent-dev libfontconfig1-dev libcap-dev libpulse-dev libudev-dev libpci-dev libnss3-dev libegl1-mesa-dev gperf bison nodejs libasound2-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-good1.0-dev libgstreamer-plugins-bad1.0-dev libbz2-dev libcups2-dev libdrm-dev libgcrypt* gyp ninja-build pulseaudio* libthread*
+	>apt install clang libclang-dev
+	下载qt工程，并更新子模块(已经下载好)：
+	>git clone -b v5.12.11 --depth=1 https://github.com/qt/qt5.git
+	>cd qt5
+	>git submodule update --init
+	编译配置：
+	>./configure -xcb -openssl-linked -I$AFSIM_3RDPARTY_PATH/openssl-3.1.1-x64-lnx/include -L$AFSIM_3RDPARTY_PATH/openssl-3.1.1-x64-lnx/lib64 --prefix=$AFSIM_3RDPARTY_PATH/qt-5.12.11-x64-lnx
+	提示选项：第一个选o（开源版），第二个选y
+	>make -j8 && make install
+      -----------------------
+	添加Qt环境变量：
+	>vim ~/.bashrc
+	末尾添加：
+	export PATH=$AFSIM_3RDPARTY_PATH/qt-5.12.11-x64-lnx/bin:"$PATH"
+	刷新环境变量：
+	>source ~/.bashrc
+       ---------------------
+	Qt编译报错：（述没出现，忽略）
+	
+	编译Qt时会报xcb的错误：
+	查询网上说法，也是不兼容的问题。需要对源码进行修改：
+	qtbase/src/plugins/platforms/xcb/qxcbkeyboard.cpp文件（直接搜索或者按照路径打开）大概在280行左右，加上ifdef跳过就行。
+	#ifdef XKB_KEY_dead_lowline
+	    Xkb2Qt<XKB_KEY_dead_lowline,        Qt::Key_Dead_Lowline>,
+	    Xkb2Qt<XKB_KEY_dead_aboveverticalline, Qt::Key_Dead_Aboveverticalline>,
+	    Xkb2Qt<XKB_KEY_dead_belowverticalline, Qt::Key_Dead_Belowverticalline>,
+	    Xkb2Qt<XKB_KEY_dead_longsolidusoverlay, Qt::Key_Dead_Longsolidusoverlay>,
+	#endif
+
+	（下面的问题我没遇到，大家遇到后按说明进行修改）
+	后面可能还会遇到‘numeric_limits’ is not a member of ‘std’这种问题，定位到文件直接添加引用#include <limits> 即可解决。
+	
+	还可能会遇到：
+	1、uint8_t is not declare ...   
+	2、enum  class xxx：uint8_t
+	3、uint32_t is not declare 
+	定位到文件，添加#include <stdint.h>
+	
+	Qt在make install的时候，最后会报错：
+	.o: qwaylandxcompositeeglwindow.o: qwaylandxcompositeeglwindow.cpp:function QWaylandXCompositeEGLWindow::createEglSurface(): (.text+0x199): 
+	    对‘QXlibEglIntegration::getCompatibleVisualId(_XDisplay*, void*, void*)’未定义的引用
+	collect2: error: ld returned 1 exit status
+	make[5]: *** [Makefile:130: ../../../../plugins/platforms/libqwayland-xcomposite-egl.so] 错误 1
+	make[5]: 离开目录“/home/hsmulation/3rd_src/qt-5.12.11/qtwayland/src/plugins/platforms/qwayland-xcomposite-egl”
+	make[4]: *** [Makefile:160: sub-qwayland-xcomposite-egl-install_subtargets-ordered] 错误 2
+	make[4]: 离开目录“/home/hsmulation/3rd_src/qt-5.12.11/qtwayland/src/plugins/platforms”
+	对AFSim编译无影响，可以不管
+
+4、AFSim编译
+	这里需要将上面编译的第三方库打包（一路下来的话应该在/home/afsim/3rd_party目录下），放到解压的afsim源码目录下的swdev/dependencies/3rd_party目录。
+	注：每一个都打包为tar.gz包，且是打包里面的目录，不是外层目录，不然AFSim在找库文件时会无法找到而报未定义的符号错误。例如，将include和lib打包为gtest-1.8.0-x64-lnx.tar.gz。
+
+cat > pack_3rd_party.sh <<'EOF'
+#!/bin/bash
+set -e
+
+SRC_DIR=/home/afsim/3rd_party
+DST_DIR=/home/afsim/3rd_party_tar
+
+mkdir -p "$DST_DIR"
+
+cd "$SRC_DIR"
+
+for d in */ ; do
+    # 去掉最后的斜杠
+    base="${d%/}"
+    tarball="${base}.tar.gz"
+
+    echo "打包 $base -> $tarball"
+
+    # -C 切到该目录，再打包里面的内容（而不是目录本身）
+    tar -czf "$DST_DIR/$tarball" -C "$base" .
+done
+
+echo "✅ 全部完成，结果在 $DST_DIR"
+EOF
+
+chmod +x pack_3rd_party.sh
+
+mv /home/afsim/3rd_party_tar/*   /home/src/afsim-2.9.0-kylin_v10_sp1_x86_64/swdev/dependencies/3rd_party
+
+	编译AFSim（编译时间约4小时）
+	>cd /home/src/afsim-2.9.0-kylin_v10_sp1_x86_64/swdev/src
+	>mkdir build && cd build
+	>cmake .. -DCMAKE_INSTALL_PREFIX=/home/afsim/afsim_bin -DCMAKE_BUILD_TYPE=Release 
+	>make -j8
+	>make install
+
+	打开源码所在目录swdev/src/，目录中要包含CMakeLists.txt。在当前目录创建一个build目录，并在build目录中生成VS工程
+	cmake -B ./build -D CPACK_BINARY_NSIS=OFF -D CPACK_BINARY_INNOSETUP=OFF -D CPACK_BINARY_IFW=ON \
+	 -D WSF_INSTALL_DEMOS=ON -D WSF_INSTALL_DEPENDENCIES=ON -D WSF_INSTALL_DOCUMENTATION=ON \
+	 -D WSF_INSTALL_SCENARIOS=ON -D WSF_INSTALL_SOURCE=OFF -D WSF_INSTALL_TOOLS=ON \
+	 -D WSF_INSTALL_TRAINING=ON
+	CPACK是CMake框架中的打包工具，可以将可执行程序、源码、文档、资源、示例等制作为安装包，方便开发者分发程序，支持用户双击安装使用。
+	NSIS
+	INNOSETUP
+	IFW 基于Qt的打包工具。也是本文使用的打包工具
+	WSF_INSTALL_DEMOS 自动复制示例到安装目录中。
+	WSF_INSTALL_DEPENDENCIES 自动复制官方提供的第三方库到安装目录中。
+	WSF_INSTALL_DOCUMENTATION 自动复制文档到安装目录中。
+	WSF_INSTALL_SCENARIOS
+	WSF_INSTALL_SOURCE 自动复制源码到安装目录中。比较耗时。
+	WSF_INSTALL_TOOLS 自动复制工具到安装目录中。
+	WSF_INSTALL_TRAINING 自动复制训练文件到安装目录中。
+
+       -------------------
+	1）frmpeg-4.2.4.cmake 文件无法找到的问题解决
+	在 afsim 的源码目录 swdev/src/tools/3rd_party-cmake 中没有 frmpeg.cmake 文件，在 Linux 上对 afsim 在 cmake 配置时，会报 frmpeg.cmake 找不到，前一篇文章的解决方法是将 swdev/tools/wkf/plugins/videocapture 插件进行删除（（这只是个插件，用于截取视频的，不影响主体功能，后期可以自己通过单独编译添加此插件）），这篇则根据 3rd 其他 cmake 文件内容，手写此 cmake。
+	/home/src/afsim-2.9.0-kylin_v10_sp1_x86_64/swdev/src/tools/3rd_party-cmake/frmpeg-4.2.4.cmake
+       ‘‘‘’’’
+	get_filename_component(CURRENT_LIST_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
+	include(${CURRENT_LIST_DIR}/shared.cmake)
+	set(FFMPEGROOT ${ffmpeg_ROOT_DIR})
+	
+	
+	set(ffmpeg_INCLUDE_DIR ${FFMPEGROOT}/include)
+	‘‘‘’’’
+       -------------------
+	2）移除单元测试项目
+	因为编译的时候，会报gtest库的符号无法加载，路径又是对的，实在找不到原因，这里就将test去掉先！仅仅是单元测试而已，不影响。
+	需要修改以下文件夹中的CMakeList.txt：注释掉add_subdirectory(test)
+	swdev/src/core/sensor_plot_lib
+	swdev/src/core/wsf
+	swdev/src/core/wsf_cyber
+	swdev/src/core/wsf_mil
+	swdev/src/core/wsf_parser
+	swdev/src/core/wsf_space
+	swdev/src/post_processor
+	swdev/src/tools/artificer
+	swdev/src/tools/geodata
+	swdev/src/tools/profiling
+	swdev/src/tools/util
+	swdev/src/tools/util_script
+	swdev/src/wizard/usmtf
+	swdev/src/wsf_plugin/wsf_air_combat
+	swdev/src/wsf_plugin/wsf_coverage
+	swdev/src/wsf_plugin/wsf_multiresolution
+	swdev/src/wsf_plugin/wsf_six_dof
+       ------------------
+	3）报 osg、osgearth 符号链接错误的解决
+	在编译 AFSim 的 mystic、wizard 和 warlock 时会报 osg 和 osgearth 的符号未定义问题，分析 C++的导出符号时，发现是因为 gcc 的版本和默认 C++编译标准的问题：
+	
+	我用的 gcc 是 9.3.0，默认 C++标准是 C++14
+	
+	gcc 版本在 5.0 以上 C++ 类型 string 符号导出为 std::__cxx11::basic_string，而之前的版本为 std::basic_string，这会造成编译 AFSim 时找不到 osg 和 osgearth 的符号。
+	
+	修改 swdev/src/CMakeList.txt
+	
+	第 32 行，将 C++标准改为 14
+	
+	text
+	31 |
+	32 | set (CMAKE_CXX_STANDARD_14)
+	33 | set (CMAKE_CXX_STANDARD_REQUIRED_ON)
+	34 | set (CMAKE_CXX_EXTENSIONS_OFF)
+	第 332 行，注释掉 ABI
+	
+	text
+	331 | # Cnat is default in gcc >= s. newer compilers with fail to pull
+	332 | # unless we rebuild 3rd party with newer versions of GCC
+	333 | # add definitions (-D_GLIBCXX_USE_CXX11_ABI=0)
+	334 | # Add linker flags to export function names
+	335 | set (CMAKE_EXE_LINKER_FLAGS $ {CMAKE_EXE_LINKER_FLAGS} "--rdynamic
+       ------------------
+	4）wizard在install找不到libtinyxml2
+
+	编译完AFSim后在make install时会报找不到libtinyxml2的错误，导致失败，查看生成的cmake_install文件发现，wizard插件WizOSMConverter在install时要拷贝一个libtinyxml2文件，但实际上编译tinyxml2不会生成这个文件，只有libtinyxml2.so文件，因此会报错。尝试复制一个又会在源码config时报错，其根本原因是cmake的配置问题。因此需从源头修改解决。分析发现，问题在/home/src/afsim-2.9.0-kylin_v10_sp1_x86_64/swdev/src/tools/3rd_party-cmake/tinyxml2-7.1.0.cmake中：
+            #${tinyxml2_ROOT}/lib/libtinyxml2
+	解决方法就是注释掉libtinyxml2这行即可。如果之前已经configure过的话，需要再次configure，然后make -j8 && make install。
+     ---------------------
+	5）make install 问题解决
+	在最后 make install 会报无权限或卡死，因为在 linux 上 install 会将 linux 根目录/下的所有文件向 resource 里面拷贝，这里的解决办法是修改 CMakeList，注释掉 resource 的拷贝过程，经测试对运行是无影响的。
+	主要修改的地方有三个：
+	swdev/src/mystic/exec/source
+	swdev/src/warlock/warlock_exec/source
+	swdev/src/wizard/main/source
+	将里面的 swdev_install_resources()注释掉。
+	
+	113
+	114 include($[TOOLS_DIRECTORY]/vespatk/cmake/install_resources.cmake)
+	115 #swdev_install_resources()
+	116
+     ---------------------
+	6）修改sqrt错误
+	afsim编译前第三方库打包并放到源码的第三方库目录下覆盖原来的压缩包。在编译时，可能会报下错误：
+	make[3]: 离开目录 "/home/MSimulation/afsim-2.9.0-bylin-v10-server-x86-64/sudev/src/build"
+	/home/MSimulation/afsim-2.9.0-bylin-v10-server-x86-64/sudev/src/core/wsf/source/MsfEM_InstMultipath.cpp: 在成员函数 'virtual double MsfEM_InstMultipath': Compactrevealedtor/src/(utf8L_instructions, MsfEm/tutorions());
+	/home/MSimulation/afsim-2.9.0-bylin-v10-server-x86-64/sudev/src/core/wsf/source/MsfEM_InstMultipath.cpp: 登录后重新编译
+	    double reveatio = sqrt(rev6aimR / rev6ainD);
+
+	原因未知，可能是sqrt内部问题，因为改为以下代码就可以了：
+	double revRatio = pow(rev6aimR / rev6ainD, 0.5)
+       -------------------
+       7） 另外，在执行mover_creator时，会报找不到libwsf_six_dof_ln7m64.so和libwsf_brawler_ln7m64.so，而这两个文件在wsf_plugins目录，拷贝到mover_creator同级目录即可启动。
+
+5、运行
+        cp  -r /home/src/afsim-2.9.0-kylin_v10_sp1_x86_64/resources   /home/afsim/afsim_bin
+        cp  -r /home/src/afsim-2.9.0-kylin_v10_sp1_x86_64/demos   /home/afsim/afsim_bin
+        export PATH=$PATH:/home/afsim/afsim_bin/bin
+
+	drwxrwxr-x 18 1000 1000 4096 Mar 14  2025 3rd_party/
+	drwxrwxr-x 18 1000 1000 4096 Mar 14  2025 bin/
+	drwx------ 68 1000 1000 4096 Mar  9  2025 demos/
+	drwx------  4 1000 1000 4096 Mar  9  2025 documentation/
+	-rw-rw-r--  1 1000 1000 1126 Mar 14  2025 readme.txt
+	drwx------  6 1000 1000 4096 Mar  9  2025 resources/
+	drwxr-xr-x  6 1000 1000 4096 Mar  9  2025 tools/
+
+
+	1）
+          cd /home/afsim/afsim_bin/demos/simple_scenario
+	   mission -rt /home/afsim/afsim_bin/demos/simple_scenario/simple_scenario.txt
+	   问题：
+	   Failed to load "/home/afsim/afsim_bin/bin/wsf_plugins/libwsf_oms_uci.so": asb-RHEL7.2_gcc4.8.5.so: cannot open shared object file: No such file or directory
+	   分析：
+	   find / -name "asb-RHEL7.2_gcc4.8.5.so"
+	   /home/src/afsim-2.9.0-kylin_v10_sp1_x86_64/swdev/src/wsf_plugins/wsf_oms_uci/lib/asb-RHEL7.2_gcc4.8.5.so
+	   解决：cp /home/src/afsim-2.9.0-kylin_v10_sp1_x86_64/swdev/src/wsf_plugins/wsf_oms_uci/lib/asb-RHEL7.2_gcc4.8.5.so   /home/afsim/afsim_bin/bin/lib
+	        ldconfig
+   
+	2)
+        wizard
+        问题：
+        Unable to open Mil-Std mapping input files.
+	 Checked the following locations:
+	  /home/afsim/afsim_bin/resources//models/milStdIconMappings.csv
+	  /home/afsim/afsim_bin/resources//site/milStdIconMappings.csv
+        解决：
+        cp  -r /home/src/afsim-2.9.0-kylin_v10_sp1_x86_64/resources   /home/afsim/afsim_bin
+        cp  -r /home/src/afsim-2.9.0-kylin_v10_sp1_x86_64/demos   /home/afsim/afsim_bin
+
+	3)
+	 warlock
+
+	4)
+	 mystic
+
+	5)
+	 mover_creator

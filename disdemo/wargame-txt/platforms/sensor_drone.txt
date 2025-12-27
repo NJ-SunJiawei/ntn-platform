@@ -1,0 +1,55 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+include_once sensors/radar/drone_radar.txt
+include_once signatures/air_target/infrared.txt
+include_once signatures/air_target/optical.txt
+include_once signatures/air_target/radar.txt
+
+platform_type SENSOR_DRONE WSF_PLATFORM 
+   icon awacs
+   
+   infrared_signature AIR_TARGET_INFRARED_SIGNATURE
+   optical_signature AIR_TARGET_OPTICAL_SIGNATURE
+   radar_signature AIR_TARGET_RADAR_SIGNATURE
+   
+   mover WSF_AIR_MOVER 
+      maximum_speed 1400 mph
+      maximum_altitude 50000 ft
+      minimum_altitude 500 ft
+      maximum_turn_rate 360 deg/min
+   end_mover
+   
+   comm sub_net TEAM_DATALINK
+      network_name <local:master>
+      internal_link data_mgr
+      internal_link task_mgr
+   end_comm
+    
+   comm cmdr_net TEAM_DATALINK
+      network_name <local:slave>
+      internal_link data_mgr
+      internal_link task_mgr
+   end_comm
+   
+   processor task_mgr WSF_TASK_PROCESSOR
+   end_processor
+   
+   processor data_mgr WSF_TRACK_PROCESSOR
+      purge_interval       60 sec
+      internal_link task_mgr
+   end_processor
+   
+   sensor DroneSensor DRONE_SENSOR
+     on
+     internal_link data_mgr
+     ignore_same_side
+   end_sensor
+   
+end_platform_type

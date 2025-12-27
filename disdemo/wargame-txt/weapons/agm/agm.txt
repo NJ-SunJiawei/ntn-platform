@@ -1,0 +1,47 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+radar_signature AGM_RADAR_SIGNATURE
+   constant 1 m^2
+end_radar_signature
+
+weapon_effects AGM_EFFECTS WSF_SPHERICAL_LETHALITY
+   minimum_radius 1 m
+   maximum_radius 500 m
+   minimum_damage .25
+   maximum_damage .251 
+end_weapon_effects
+
+weapon AGM WSF_EXPLICIT_WEAPON 
+   launched_platform_type AGM_PLATFORM
+   weapon_effects AGM_EFFECTS
+end_weapon
+
+platform_type AGM_PLATFORM WSF_PLATFORM 
+   icon agm-109
+   radar_signature AGM_RADAR_SIGNATURE
+
+   mover WSF_GUIDED_MOVER
+      aero WSF_AERO
+      mass 500 lbs
+      update_interval 0.01 s
+   end_mover
+
+   processor guidance_computer WSF_GUIDANCE_COMPUTER
+      proportional_navigation_gain 10.0
+      velocity_pursuit_gain        10.0
+      g_bias                        1.0
+      maximum_commanded_g          25.0 g
+      guidance_delay                0.0 sec
+   end_processor
+
+   processor fuse WSF_GROUND_TARGET_FUSE
+      maximum_time_of_flight 250 seconds
+   end_processor
+end_platform_type

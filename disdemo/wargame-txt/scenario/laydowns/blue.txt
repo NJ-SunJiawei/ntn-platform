@@ -1,0 +1,108 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+include_once platforms/include.txt
+include_once zones/red_zone.txt
+include_once zones/green_zone.txt
+include_once zones/purple_zone.txt
+
+platform BlueBase COMMAND 
+   side blue
+   position 39:10:17.55n 102:02:33.16w
+   heading 180 deg
+   
+end_platform
+
+platform BravoBlue FIGHTER 
+   side blue
+   heading 90 deg
+
+   route
+      label bravo_loiter
+      position 39:02:35.410n 101:40:38.460w altitude 25000.00 ft
+         speed 500 mph
+      position 39:02:05n 101:21:43w altitude 25000.00 ft
+      position 38:51:01.000n 101:22:09.000w
+      position 38:51:32.000n 101:40:52.000w
+      goto bravo_loiter
+   end_route
+
+end_platform
+
+platform CharlieBlue FIGHTER 
+   side blue
+   heading 90 deg
+   
+   route
+      label charlie_loiter
+      position 39:22:24.250n 101:40:42.190w altitude 25000.00 ft
+         speed 500 mph
+      position 39:22:22.000n 101:22:03.000w
+      position 39:32:32n 101:22:10w
+      position 39:32:16.000n 101:40:32.000w
+      goto charlie_loiter
+   end_route
+
+end_platform
+
+platform BlueBomber BOMBER
+   side blue 
+   heading 90 deg
+
+   route
+      label bomber_loiter
+      position 39:12:28.79n 101:54:04.74w altitude 25000.00 ft
+         speed 500 mph
+      position 39:12:19.000n 101:48:23.000w
+      position 39:02:30.000n 101:48:24.000w
+      position 39:02:39.000n 101:54:10.000w
+      position 39:22:24n 101:54:14w
+      position 39:22:14.000n 101:48:22.000w
+      position 39:12:23.000n 101:48:30.000w
+      goto bomber_loiter
+   end_route
+
+end_platform
+
+
+platform BlueSamLauncher SAM_LAUNCHER
+   side blue
+   heading 90 deg
+   position 39:07:23.19n 101:53:57.84w
+
+   route
+      label sam_loiter
+      position 39:07:44.690n 102:04:56.510w
+         speed 50 mph
+      position 39:07:37n 102:00:08w
+      position 39:12:48.000n 102:00:11.000w
+      position 39:12:52.000n 102:05:06.000w
+      goto sam_loiter
+   end_route
+
+end_platform
+
+platform BlueDrone SENSOR_DRONE
+   side blue
+   heading 90 deg
+
+   route
+      label drone_loiter
+      position 39:12:19.770n 101:48:18.080w altitude 25000.00 ft
+         speed 500 mph
+      position 39:12:15.000n 101:40:41.000w
+      position 39:02:27.000n 101:40:29.000w
+      position 39:02:29n 101:48:22w
+      position 39:22:21.000n 101:48:18.000w
+      position 39:22:24.000n 101:40:59.000w
+      position 39:12:26.000n 101:40:40.000w
+      goto drone_loiter
+   end_route
+
+end_platform

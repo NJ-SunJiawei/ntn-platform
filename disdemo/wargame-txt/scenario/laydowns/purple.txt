@@ -1,0 +1,112 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+include_once platforms/include.txt
+include_once zones/blue_zone.txt
+include_once zones/red_zone.txt
+include_once zones/green_zone.txt
+
+platform PurpleBase COMMAND 
+   side purple
+   position 41:19:28.22n 100:01:32.30w
+   heading 180 deg
+end_platform
+
+platform BravoPurple FIGHTER 
+   side purple
+   heading 180 deg
+
+   route
+      label bravo_loiter
+      position 41:03:34.20n 100:07:13.03w
+         altitude 25000.00 ft
+         speed 500 mph
+      position 40:51:16n 100:07:48w
+      position 40:50:57n 100:25:19w
+      position 41:03:23n 100:24:44w
+      goto bravo_loiter
+   end_route
+
+end_platform
+
+platform CharliePurple FIGHTER 
+   side purple
+   heading 180 deg
+
+   route
+      label charlie_loiter
+      position 41:03:38.27n 99:53:59.36w
+         altitude 25000.00 ft
+         speed 500 mph
+      position 40:51:18n 99:53:51w
+      position 40:51:07n 99:38:02w
+      position 41:03:34n 99:37:01w
+      goto charlie_loiter
+   end_route
+
+end_platform
+
+platform PurpleBomber BOMBER
+   side purple
+   heading 180 deg
+
+   route
+      label bomber_loiter
+      position 41:08:43.74n 100:00:41.86w
+         altitude 25000.00 ft
+         speed 500 mph
+      position 41:03:44n 100:00:46w
+      position 41:03:51n 99:54:10w
+      position 41:08:36n 99:54:13w
+      position 41:08:44n 100:07:10w
+      position 41:03:25n 100:07:15w
+      position 41:03:40n 100:00:46w
+      goto bomber_loiter
+   end_route
+
+end_platform
+
+platform PurpleSamLauncher SAM_LAUNCHER
+   side purple
+   position 39:33:23.88n 98:05:45.96w 
+   heading 180 deg
+
+   route
+      label sam_loiter
+      position 41:18:24.85n 99:59:25.83w
+         speed 50 mph
+      position 41:18:25n 100:03:16w
+      position 41:20:38n 100:03:18w
+      position 41:20:42n 99:59:22w
+      goto sam_loiter
+   end_route
+
+end_platform
+
+platform PurpleDrone SENSOR_DRONE
+   side purple
+   position 39:32:09.66n 98:09:34.68w
+   altitude 50000 ft 
+   heading 180 deg
+
+   route
+      label drone_loiter
+      position 41:15:38.53n 100:00:30.70w
+         altitude 25000.00 ft
+         speed 500 mph
+      position 41:08:39n 100:00:53w
+      position 41:08:44n 99:54:00w
+      position 41:15:42n 99:53:46w
+      position 41:15:29n 100:07:09w
+      position 41:08:51n 100:07:08w
+      position 41:08:40n 100:00:54w
+      goto drone_loiter
+   end_route
+
+end_platform

@@ -1,0 +1,75 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+
+dis_interface
+
+   #Broadcast vs Multicast: choose one to define based on needs.
+
+   #broadcast <broadcast-IP-address>
+   #Defining a broadcast will cause packets to be sent to all hosts connected to the network.
+   #Broadcasts are typically made up with the first six numbers of your IP following a mask.
+   #Ex: broadcast 192.168.255.255 ---> Ip:192.168.1.4 and Mask:255.255.0.0
+   
+   broadcast 172.17.255.255
+
+   #multicast <multicast-IP-address> <interface-address>
+   #Defining a multicast will insure packets are sent to only intended recipients.
+   #multicast-ip-address: An address in the range 224.0.0.0 to 239.255.255.255.
+   #interface-address: The first six digit of your machine s IP address.
+   #Ex: multicast 224.0.0.0 192.168
+   
+   #port <ip-port-number>
+   #A communication endpoint for computers on a network. choose a number between 1024 and 65535
+   #Ports from 0 to 1023 are usually reserved for privileged services and should be avoided.
+   #Ex:
+   port 7654
+   
+   #send_port <IP-port-number>
+   #receive_port <IP-port-number>
+   #The ports in which you send and recieve data can be specified seperately. 
+   #Choose two port numbers between 1024 and 65535
+   
+   #force <side> <dis-force-id>
+   #Specify the DIS force identifier that corresponds to a WSF platform side. 
+   #This command should be specified for each side that is present in the scenario.
+   #Ex:
+   force blue   1
+   force red    2
+   force green  3
+   force purple 4
+   
+   #entity_type <platform_type> <dis-entity-type>
+   #Specify the DIS entity type to be used when sending PDUs for platforms or munitions 
+   #with the indicated WSF platform type. This command should be specified for each
+   #WSF platform type that is present in the scenario. If the type of a platform does 
+   #not have a corresponding DIS entity type then 0:0:0:0:0:0:0 will be used. 
+   #For proper WSF interaction of received DIS entities from other networked simulations, 
+   #a corresponding simple platform_type must be created with defined signatures.
+   #Ex:
+   entity_type BOMBER              1:1:200:1:1:1:0 
+   entity_type COMMAND             1:1:200:2:2:2:0 
+   entity_type FIGHTER             1:1:200:3:3:3:0 
+   entity_type SAM_LAUNCHER        1:1:200:4:4:4:0
+   entity_type SENSOR_DRONE        1:1:200:5:5:5:0
+   entity_type AAM_BASE            1:1:200:6:6:6:0
+   entity_type AGM                 1:1:200:7:7:7:0
+   entity_type ATG                 1:1:200:8:8:8:0
+
+   #application <ignore_type <dis_entity_type>
+   #Specify the DIS application ID in the range [1, 65534]. Each scenario will need to overide this interface and 
+   #have a unique application number. see red_team.txt
+   #Ex:
+   application 11
+   
+   #site <dis-site-id>
+   #Specify the DIS site ID in the range [1, 65534].
+   site 22
+end_dis_interface
+

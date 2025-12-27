@@ -1,0 +1,47 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+antenna_pattern SCOUT_RADAR_ANTENNA
+      circular_pattern
+      peak_gain 20 db
+      beamwidth 15 deg
+      minimum_gain 20 db
+end_antenna_pattern
+
+sensor SCOUT_RADAR WSF_RADAR_SENSOR 
+   
+   scan_mode                      azimuth_and_elevation
+      
+   maximum_range                  50.0 miles
+   
+   transmitter 
+      antenna_pattern             SCOUT_RADAR_ANTENNA
+      power                       1000.0 kw
+      frequency                   200 mhz
+      internal_loss               2 db
+   end_transmitter
+   
+   receiver
+      antenna_pattern             SCOUT_RADAR_ANTENNA
+      bandwidth                   30.0 khz
+      noise_power                 -160 dBw  # will be calibrated for 1 m^2
+      internal_loss               7 dB
+   end_receiver  
+      
+   reports_velocity
+   reports_side
+   reports_type
+   reports_location
+   
+   frame_time                     2.0 sec
+   
+   azimuth_field_of_view          -15 deg 15 deg
+   elevation_field_of_view        -15 deg 15 deg
+   
+end_sensor

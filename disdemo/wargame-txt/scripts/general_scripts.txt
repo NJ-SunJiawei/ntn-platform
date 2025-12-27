@@ -1,0 +1,178 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+include_once scripts/blue_team_hints.txt
+include_once scripts/red_team_hints.txt
+include_once scripts/green_team_hints.txt
+include_once scripts/purple_team_hints.txt
+
+script void playerCheck()
+   string prompt = "";
+   
+   bool redPlayer = false;
+   bool greenPlayer = false;
+   bool purplePlayer = false;
+   bool bluePlayer = false;   
+   
+   for(int i = 0; i < WsfSimulation.PlatformCount(); i = i + 1)
+   {
+      WsfPlatform pltfm = WsfSimulation.PlatformEntry(i);
+      if(pltfm.Side() == "blue")
+      {
+         bluePlayer = true;
+      }
+      else if(pltfm.Side() == "green")
+      {
+         greenPlayer = true;
+      }
+      else if(pltfm.Side() == "red")
+      {
+         redPlayer = true;
+      }
+      else if(pltfm.Side() == "purple")
+      {
+         purplePlayer = true;
+      }
+   }
+   
+   if(!redPlayer || !purplePlayer || !greenPlayer || !bluePlayer)
+   {
+      prompt += "The following players are missing from the scenario:<br><br>";
+      
+      if(!bluePlayer)
+      {
+         prompt += "BLUE<br>";
+      }
+      
+      if(!redPlayer)
+      {
+         prompt += "RED<br>";
+      }
+   
+      if(!greenPlayer)
+      {
+         prompt += "GREEN<br>";
+      }
+      
+      if(!purplePlayer)
+      {
+         prompt += "PURPLE<br>";
+      }
+      
+      WsfPrompt.Display("Players Missing", prompt);
+   }
+   
+end_script
+
+script void info(string aColor)
+   string info = "<h2>Mission Objective:</h2>";
+   info += "Your mission is to seek out and destroy the opposing player(s) bases.";
+   info += "The last player<br>with their base intact wins. However, you must act with ";
+   info += "caution. The enemy(s)<br>are well armed and looking for you too.";
+   info += "<h2>General Tips:</h2>";
+   info += "<ul><li>Click the Intel button! Knowledge will be your greatest asset!</li><br>";
+   info += "<li>You can access Mission Objective and the Intel prompt at anytime<br>"; 
+   info += "via the Script Browser in the View menu.</li><br>";
+   info += "<li>Intel provides the cardinal points and bearings from your location<br>";
+   info += "to the enemy's base(s). Zones provide a rough sense of the enemy's <br>";
+   info += "location(s), and can be enabled via the Zone Browser in the View menu.</li><br>";
+   info += "<li>The Sensor Drone is unarmed but has great detection capabilities.</li><br>";
+   info += "<li>The Fighters have the most offense capabilities but limited detection<br>";
+   info += "capabilities.</li>";
+   
+   Array<string> script;
+   if(aColor == "blue")
+   {
+       script = {"blue_hint"};
+   }
+   else if(aColor == "red")
+   {
+      script = {"red_hint"};
+   }
+   else if(aColor == "green")
+   {
+      script = {"green_hint"};
+   }
+   else if(aColor == "purple")
+   {
+      script = {"purple_hint"};
+   }
+   else
+   {
+      script = {"info"};
+      info = "aColor was not entered correctly or does not exist";
+   }
+   
+   Array<string> button = {"Intel"};
+   
+   WsfPrompt.Display("Mission Brief", info, script, button);
+end_script
+
+# The WARLOCK_ prefix on these scripts will cause these scripts to be visible in the Script Browser in Warlock
+script void WARLOCK_BlueInfo()
+   info("blue");
+end_script
+
+script void WARLOCK_GreenInfo()
+   info("green");
+end_script
+
+script void WARLOCK_PurpleInfo()
+   info("purple");
+end_script
+
+script void WARLOCK_RedInfo()
+   info("red");
+end_script
+
+script void ready_up_prompt()
+   string prompt = "When all players are connected press Ok to begin.<br><br> ";
+   prompt += "<a doclink=\"warlock_demo.html\">Scenario Documentation</a>";
+   
+   WsfPrompt.DisplayAndPause("Ready Check", prompt);
+end_script
+
+script void PlatformDeleted(WsfPlatform aPlatform)
+   if(aPlatform.Name() == "BlueBase")
+   {
+      WsfPrompt.Display("Game Over", "Your Base Was Destroyed!");
+      WsfSimulation.DeletePlatform("BravoBlue");
+      WsfSimulation.DeletePlatform("CharlieBlue");
+      WsfSimulation.DeletePlatform("BlueBomber");
+      WsfSimulation.DeletePlatform("BlueMR_Sam_Launcher_Radar");
+      WsfSimulation.DeletePlatform("BlueDrone");
+   }
+   else if(aPlatform.Name() == "GreenBase")
+   {
+      WsfPrompt.Display("Game Over", "Your Base Was Destroyed!");
+      WsfSimulation.DeletePlatform("BravoGreen");
+      WsfSimulation.DeletePlatform("CharlieGreen");
+      WsfSimulation.DeletePlatform("GreenBomber");
+      WsfSimulation.DeletePlatform("GreenMR_Sam_Launcher_Radar");
+      WsfSimulation.DeletePlatform("GreenDrone"); 
+   }
+   else if(aPlatform.Name() == "PurpleBase")
+   {
+      WsfPrompt.Display("Game Over", "Your Base Was Destroyed!");
+      WsfSimulation.DeletePlatform("BravoBlue");
+      WsfSimulation.DeletePlatform("CharlieBlue");
+      WsfSimulation.DeletePlatform("BlueBomber");
+      WsfSimulation.DeletePlatform("BlueMR_Sam_Launcher_Radar");
+      WsfSimulation.DeletePlatform("PurpleDrone"); 
+   }
+   else if(aPlatform.Name() == "RedBase")
+   {
+      WsfPrompt.Display("Game Over", "Your Base Was Destroyed!");
+      WsfSimulation.DeletePlatform("BravoRed");
+      WsfSimulation.DeletePlatform("CharlieRed");
+      WsfSimulation.DeletePlatform("RedBomber");
+      WsfSimulation.DeletePlatform("RedMR_Sam_Launcher_Radar");
+      WsfSimulation.DeletePlatform("RedDrone");
+   }
+end_script

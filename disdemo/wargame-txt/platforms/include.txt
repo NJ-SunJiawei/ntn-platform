@@ -1,0 +1,14 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+include_once platforms/command.txt
+include_once platforms/sensor_drone.txt
+include_once platforms/fighter.txt
+include_once platforms/bomber.txt
+include_once platforms/sam_launcher.txt

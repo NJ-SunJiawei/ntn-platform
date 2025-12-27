@@ -1,0 +1,29 @@
+# ****************************************************************************
+# CUI
+#
+# The Advanced Framework for Simulation, Integration, and Modeling (AFSIM)
+#
+# The use, dissemination or disclosure of data in this file is subject to
+# limitation or restriction. See accompanying README and LICENSE for details.
+# ****************************************************************************
+
+# This scenario is intended to be run via Warlock
+conditional_section
+   conditionals
+      feature_present warlock
+   end_conditionals
+  
+   script void checkForWarlock()
+      // Do nothing
+   end_script
+end_conditional_section
+
+conditional_section
+   conditionals
+      feature_not_present warlock
+   end_conditionals
+  
+   script void checkForWarlock()
+      writeln("***** Warlock Not Found, It is recommended to use Warlock to run this demo. *****");   
+   end_script
+end_conditional_section
