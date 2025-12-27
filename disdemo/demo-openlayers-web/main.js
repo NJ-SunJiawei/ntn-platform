@@ -216,4 +216,10 @@ ws.onmessage = function(e){
       features[entityID]=imagF
     }
   }
+  // 处理电磁发射PDU (PDU Type 23)
+  else if (disMessage.pduType === 23) {
+    // 获取发射实体ID
+    const emittingEntityID = disMessage.emittingEntityID.application + ":" + disMessage.emittingEntityID.site + ":" + disMessage.emittingEntityID.entity;
+    console.log("处理电磁发射PDU，发射实体ID:", emittingEntityID);
+  }
 }

@@ -5,13 +5,16 @@ port:
     cesium-web:8080
     cppcontorl:
 
+open-dis-cpp:
+https://github.com/open-dis/open-dis-cpp.git
+
 1、wargame-txt 选定的仿真场景
    修改dis相关配置，因为在容器运行，只修改了广播ip
 
 2、制作nodejs base镜像
     docker run --rm --name nodejs-base -it ubuntu:20.04 bash
         >apt update
-        >apt install -y curl net-tools vim iputils-ping
+        >apt install -y curl net-tools vim iputils-ping make cmake gcc g++
         >curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
         >apt install -y nodejs
     版本：node -v ===》v20.19.6
@@ -49,6 +52,7 @@ port:
 
 
 3、demo-cesium-web 前端框架(WebSocket 客户端) 注意ws的ip替换为nodejs所在容器的ip
+   Cesium-1.128.zip
    docker run --name demo-cesium-web -itd -p 8080:8080 nodejs-base:v1 bash
    docker cp ./demo-cesium-web demo-cesium-web:/home/demo-cesium-web
    docker exec -it demo-cesium-web bash
@@ -68,7 +72,7 @@ port:
     xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f /tmp/.docker.xauth nmerge -
 
     (同机器上docker之间端口访问不需要映射)
-    docker run --name  afsim -itd -p  -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix  -v /tmp/.docker.xauth:/tmp/.docker.xauth -e XAUTHORITY=/tmp/.docker.xauth ubuntu-afsim:20.04 /bin/bash
+    docker run --name  afsim -itd -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix  -v /tmp/.docker.xauth:/tmp/.docker.xauth -e XAUTHORITY=/tmp/.docker.xauth ubuntu-afsim:20.04 /bin/bash
     docker cp ./demo-dis-wsfplugin afsim:/home/src/afsim-2.9.0-kylin_v10_sp1_x86_64/swdev/src/wsf_plugins/
     docker exec -it afsim bash
         >cd /home/src/afsim-2.9.0-kylin_v10_sp1_x86_64/swdev/src/build
@@ -77,3 +81,23 @@ port:
         >make install
 
         >warlock /home/afsim/afsim_bin/demos/wargame/green_team.txt
+
+6、运行demo-cppcontrol
+    rm -rf /tmp/.docker.xauth*
+    touch /tmp/.docker.xauth
+    chmod 600 /tmp/.docker.xauth
+    chown root:root /tmp/.docker.xauth
+    xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f /tmp/.docker.xauth nmerge -
+
+    docker run --name demo-cppcontrol -itd -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix  -v /tmp/.docker.xauth:/tmp/.docker.xauth -e XAUTHORITY=/tmp/.docker.xauth nodejs-base:v1 bash
+    docker cp ./demo-cppcontrol demo-cppcontrol:/home/demo-cppcontrol
+    docker exec -it demo-cppcontrol bash
+        >apt install -y qt5-default //安装qt5
+
+        先编译dis库：
+        >cd OpenDIS-cpp-1.1.0/opendis-cpp-1.1.0/
+        >mkdir build && cd build && cmake .. && make install
+
+        编译demo-cppcontrol：
+        >cd /home/demo-cppcontrol
+        >mkdir build && cd build && cmake .. && make

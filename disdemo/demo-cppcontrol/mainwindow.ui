@@ -20,14 +20,14 @@
       <item>
        <widget class="QPushButton" name="pushButtonClear">
         <property name="text">
-         <string>清空</string>
+         <string>reset</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>仿真时间：</string>
+         <string>time:</string>
         </property>
        </widget>
       </item>
@@ -62,37 +62,37 @@
       </property>
       <column>
        <property name="text">
-        <string>实体号</string>
+        <string>no</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>经度</string>
+        <string>jd</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>纬度</string>
+        <string>wd</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>高度</string>
+        <string>gd</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>航向</string>
+        <string>hx</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>DIS版本</string>
+        <string>dis</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>演练号</string>
+        <string>tt</string>
        </property>
       </column>
      </widget>
@@ -105,7 +105,7 @@
       <item>
        <widget class="QPushButton" name="pushButtonLeft">
         <property name="text">
-         <string>旋转（只对固定平台）</string>
+         <string>xuanzhuan</string>
         </property>
        </widget>
       </item>

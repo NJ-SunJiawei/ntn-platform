@@ -17,10 +17,14 @@ server.on('message', (msg, rinfo) => {
             case 16: break;
             case 1: // EntityState PDU:
                 broadcastMessage(JSON.stringify(disMessage));
-                console.log("EntityState PDU (Type 1):", JSON.stringify(disMessage, null, 2));
+                console.log("EntityState PDU (Type 1):", JSON.stringify(disMessage));
+                break;
+            case 23: // Electromagnetic Emission PDU:
+                broadcastMessage(JSON.stringify(disMessage));
+                console.log("Electromagnetic Emission PDU (Type 23):", JSON.stringify(disMessage));
                 break;
             default:
-                console.log(`PDU Type ${disMessage.pduType}:`, JSON.stringify(disMessage, null, 2));
+                console.log(`PDU Type ${disMessage.pduType}:`, JSON.stringify(disMessage));
         }
     }
     catch(e)

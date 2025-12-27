@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QMainWindow>
-#include "ui_MainWindow.h"
+#include "ui_mainwindow.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindowClass; };
@@ -14,31 +14,30 @@ QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow, public DIS::IPacketProcessor
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	MainWindow(QWidget *parent = nullptr);
-	~MainWindow();
+    MainWindow(QWidget *parent = nullptr);
+    ~MainWindow();
 
 protected:
-	// DIS数据处理器，实现DIS::IPacketProcessor方法
-	void Process(const DIS::Pdu& packet);
-
+    // DIS鍗忚澶勭悊瀹炵幇DIS::IPacketProcessor
+    void Process(const DIS::Pdu& packet);
 
 protected slots:
-	void on_pushButtonClear_clicked();
-	void on_pushButtonLeft_clicked();
-	void on_pushButtonPause_clicked();
-	void on_pushButtonResume_clicked();
-	void readPendingDatagrams();
+    void on_pushButtonClear_clicked();
+    void on_pushButtonLeft_clicked();
+    void on_pushButtonPause_clicked();
+    void on_pushButtonResume_clicked();
+    void readPendingDatagrams();
 
 private:
-	Ui::MainWindowClass *ui;
+    Ui::MainWindowClass *ui;
 
-	QUdpSocket m_udpSocket;
+    QUdpSocket m_udpSocket;
 
-	int getSelectedRow();
+    int getSelectedRow();
 
-	void processEntityState(const DIS::Pdu& packet);
-	void processActionRequest(const DIS::Pdu& packet);
+    void processEntityState(const DIS::Pdu& packet);
+    void processActionRequest(const DIS::Pdu& packet);
 };
