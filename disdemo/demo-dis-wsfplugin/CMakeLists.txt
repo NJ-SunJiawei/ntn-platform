@@ -13,6 +13,12 @@ SRCS
    ${SRCS}
 )
 
+# Add the library with sources
+#add_library(${PROJECT_NAME} ${SRCS})
+
+# Generate header with the __declspec export macro defined.
+generate_export_header(${PROJECT_NAME})
+
 target_include_directories(${PROJECT_NAME} PUBLIC
                           "${CMAKE_CURRENT_SOURCE_DIR}"
                           "${PROJECT_BINARY_DIR}/source")
